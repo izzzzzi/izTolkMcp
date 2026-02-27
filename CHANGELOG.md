@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/izzzzzi/izTolkMcp/compare/v1.1.0...v1.1.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* update server.json description and version for MCP Registry ([b2bb554](https://github.com/izzzzzi/izTolkMcp/commit/b2bb5543293fadf5a47e297cd8386740c0f35d15))
+
 # [1.1.0](https://github.com/izzzzzi/izTolkMcp/compare/v1.0.0...v1.1.0) (2026-02-27)
 
 
