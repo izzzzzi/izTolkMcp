@@ -1,0 +1,54 @@
+{
+  "name": "iz-tolk-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Tolk smart contract compiler — compile, analyze, and explore TON smart contracts from any MCP-compatible AI assistant",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "iz-tolk-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && cp -r src/content dist/content",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "lint": "biome check src/ test/",
+    "lint:fix": "biome check --write src/ test/",
+    "format": "biome format --write src/ test/",
+    "release": "semantic-release",
+    "prepare": "husky"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "mcp",
+    "tolk",
+    "ton",
+    "smart-contracts",
+    "compiler"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@ton/core": "^0.63.1",
+    "@ton/tolk-js": "^0.6.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@types/node": "^22.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "semantic-release": "^24.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
