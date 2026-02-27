@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/izzzzzi/izTolkMcp/compare/v1.0.0...v1.1.0) (2026-02-27)
+
+
+### Features
+
+* add MCP registry, Smithery, and Glama config files ([1099405](https://github.com/izzzzzi/izTolkMcp/commit/1099405670688a254f3fd3f519878f184443208e))
+
 # 1.0.0 (2026-02-27)
 
 
