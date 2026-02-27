@@ -20,15 +20,16 @@ function createServer(): McpServer {
 
 export { createServer };
 
-const server = createServer();
+const isDirectRun = process.argv[1] && (process.argv[1].endsWith("/index.js") || process.argv[1].endsWith("/index.ts"));
 
-async function main() {
+if (isDirectRun) {
+  const server = createServer();
   const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("iz-tolk-mcp server started on stdio");
+  server.connect(transport).then(
+    () => console.error("iz-tolk-mcp server started on stdio"),
+    (err) => {
+      console.error("Fatal error:", err);
+      process.exit(1);
+    },
+  );
 }
-
-main().catch((err) => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
