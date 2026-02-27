@@ -1,6 +1,6 @@
 {
   "name": "iz-tolk-mcp",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "mcpName": "io.github.izzzzzi/iz-tolk-mcp",
   "description": "MCP server for Tolk smart contract compiler — compile, analyze, and explore TON smart contracts from any MCP-compatible AI assistant",
   "type": "module",

@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/izzzzzi/izTolkMcp/compare/v1.1.1...v1.2.0) (2026-02-27)
+
+
+### Features
+
+* add Smithery compatibility — createSandboxServer export and CJS fallback ([7b25686](https://github.com/izzzzzi/izTolkMcp/commit/7b256862c0180ac89cc614d5cd71520cc6854505))
+
 ## [1.1.1](https://github.com/izzzzzi/izTolkMcp/compare/v1.1.0...v1.1.1) (2026-02-27)
 
 
