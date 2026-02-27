@@ -46,7 +46,7 @@
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@ton/core": "^0.63.1",
     "@ton/tolk-js": "^1.2.0",
-    "zod": "^3.25.0"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
