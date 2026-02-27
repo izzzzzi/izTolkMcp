@@ -19,6 +19,9 @@ function createServer(): McpServer {
 }
 
 export { createServer };
+export function createSandboxServer() {
+  return createServer();
+}
 
 const isDirectRun = process.argv[1] && (process.argv[1].endsWith("/index.js") || process.argv[1].endsWith("/index.ts"));
 

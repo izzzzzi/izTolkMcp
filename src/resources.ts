@@ -3,8 +3,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const contentDir = join(__dirname, "content");
+const currentDir = import.meta.url ? dirname(fileURLToPath(import.meta.url)) : process.cwd();
+const contentDir = join(currentDir, "content");
 
 function loadContent(filename: string): string {
   return readFileSync(join(contentDir, filename), "utf-8");
