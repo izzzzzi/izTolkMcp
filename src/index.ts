@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import { registerPrompts } from "./prompts.js";
 import { registerResources } from "./resources.js";
 import { registerTools } from "./tools.js";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const { version } = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf-8")) as { version: string };
+
 function createServer(): McpServer {
   const server = new McpServer(
-    { name: "iz-tolk-mcp", version: "1.0.0" },
+    { name: "iz-tolk-mcp", version },
     { capabilities: { tools: {}, resources: {}, prompts: {} } },
   );
 

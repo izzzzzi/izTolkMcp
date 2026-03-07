@@ -17,7 +17,7 @@ function validateSources(sources: Record<string, string>, entrypointFileName: st
     return `Too many source files (${keys.length}). Maximum is ${MAX_FILE_COUNT}.`;
   }
 
-  if (!sources[entrypointFileName]) {
+  if (!(entrypointFileName in sources)) {
     return `Entrypoint file "${entrypointFileName}" not found in sources. ` + `Available files: ${keys.join(", ")}`;
   }
 
@@ -78,17 +78,16 @@ export function registerTools(server: McpServer): void {
     {
       entrypointFileName: z.string().describe('The main .tolk file to compile (e.g., "main.tolk")'),
       sources: z
-        .any()
+        .record(z.string(), z.string())
         .describe(
           "Object mapping filename -> source code content. Must include the entrypoint file. " +
             'Example: {"main.tolk": "fun main(): int { return 0; }"}',
         ),
-      optimizationLevel: z.number().optional().describe("Optimization level 0-2 (default: 2)"),
+      optimizationLevel: z.number().int().min(0).max(2).optional().describe("Optimization level 0-2 (default: 2)"),
       withStackComments: z.boolean().optional().describe("Include stack layout comments in Fift output"),
     },
     async (args) => {
-      const sources = args.sources as Record<string, string>;
-      const entrypointFileName = args.entrypointFileName;
+      const { sources, entrypointFileName } = args;
 
       const validationError = validateSources(sources, entrypointFileName);
       if (validationError) {
@@ -155,15 +154,14 @@ export function registerTools(server: McpServer): void {
     {
       entrypointFileName: z.string().describe('The main .tolk file to check (e.g., "main.tolk")'),
       sources: z
-        .any()
+        .record(z.string(), z.string())
         .describe(
           "Object mapping filename -> source code content. Must include the entrypoint file. " +
             'Example: {"main.tolk": "fun main(): int { return 0; }"}',
         ),
     },
     async (args) => {
-      const sources = args.sources as Record<string, string>;
-      const entrypointFileName = args.entrypointFileName;
+      const { sources, entrypointFileName } = args;
 
       const validationError = validateSources(sources, entrypointFileName);
       if (validationError) {
@@ -220,6 +218,7 @@ export function registerTools(server: McpServer): void {
       workchain: z.number().optional().describe("Target workchain ID (default: 0, the basechain)"),
       amount: z
         .string()
+        .regex(/^\d+$/, "amount must be a non-negative integer string (nanoTON)")
         .optional()
         .describe('Amount in nanoTON to send with deploy message (default: "50000000" = 0.05 TON)'),
     },

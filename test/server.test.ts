@@ -471,4 +471,58 @@ describe("MCP server integration", () => {
     const text = (result.content as any[])[0].text;
     expect(text).toContain("Compilation Successful");
   });
+
+  it("compile_tolk with null sources rejects at schema level", async () => {
+    await expect(
+      client.callTool({
+        name: "compile_tolk",
+        arguments: { entrypointFileName: "main.tolk", sources: null },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("compile_tolk with empty-string entrypoint content does not report entrypoint not found", async () => {
+    const result = await client.callTool({
+      name: "compile_tolk",
+      arguments: {
+        entrypointFileName: "main.tolk",
+        sources: { "main.tolk": "" },
+      },
+    });
+    const text = (result.content as any[])[0].text;
+    expect(text).not.toContain("not found");
+  });
+
+  it("compile_tolk with out-of-range optimizationLevel rejects at schema level", async () => {
+    await expect(
+      client.callTool({
+        name: "compile_tolk",
+        arguments: {
+          entrypointFileName: "main.tolk",
+          sources: { "main.tolk": MINIMAL_CONTRACT },
+          optimizationLevel: 999,
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("generate_deploy_link with non-numeric amount rejects at schema level", async () => {
+    const compileResult = await client.callTool({
+      name: "compile_tolk",
+      arguments: {
+        entrypointFileName: "main.tolk",
+        sources: { "main.tolk": MINIMAL_CONTRACT },
+      },
+    });
+    const compileText = (compileResult.content as any[])[0].text;
+    const bocMatch = compileText.match(/### BoC \(base64\)\n```\n(.+)\n```/);
+    expect(bocMatch).toBeTruthy();
+
+    await expect(
+      client.callTool({
+        name: "generate_deploy_link",
+        arguments: { codeBoc64: bocMatch![1], amount: "abc" },
+      }),
+    ).rejects.toThrow();
+  });
 });
