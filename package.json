@@ -9,7 +9,7 @@
     "iz-tolk-mcp": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && cp -r src/content dist/content",
+    "build": "tsc && node scripts/copy-content.js",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "test": "vitest run",

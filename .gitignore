@@ -3,3 +3,5 @@ dist/
 *.tgz
 .DS_Store
 .conventions/
+.mcpregistry_*
+.playwright-mcp/

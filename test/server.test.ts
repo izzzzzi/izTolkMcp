@@ -472,13 +472,12 @@ describe("MCP server integration", () => {
     expect(text).toContain("Compilation Successful");
   });
 
-  it("compile_tolk with null sources rejects at schema level", async () => {
-    await expect(
-      client.callTool({
-        name: "compile_tolk",
-        arguments: { entrypointFileName: "main.tolk", sources: null },
-      }),
-    ).rejects.toThrow();
+  it("compile_tolk with null sources returns validation error", async () => {
+    const result = await client.callTool({
+      name: "compile_tolk",
+      arguments: { entrypointFileName: "main.tolk", sources: null },
+    });
+    expect(result.isError).toBe(true);
   });
 
   it("compile_tolk with empty-string entrypoint content does not report entrypoint not found", async () => {
@@ -493,20 +492,19 @@ describe("MCP server integration", () => {
     expect(text).not.toContain("not found");
   });
 
-  it("compile_tolk with out-of-range optimizationLevel rejects at schema level", async () => {
-    await expect(
-      client.callTool({
-        name: "compile_tolk",
-        arguments: {
-          entrypointFileName: "main.tolk",
-          sources: { "main.tolk": MINIMAL_CONTRACT },
-          optimizationLevel: 999,
-        },
-      }),
-    ).rejects.toThrow();
+  it("compile_tolk with out-of-range optimizationLevel returns validation error", async () => {
+    const result = await client.callTool({
+      name: "compile_tolk",
+      arguments: {
+        entrypointFileName: "main.tolk",
+        sources: { "main.tolk": MINIMAL_CONTRACT },
+        optimizationLevel: 999,
+      },
+    });
+    expect(result.isError).toBe(true);
   });
 
-  it("generate_deploy_link with non-numeric amount rejects at schema level", async () => {
+  it("generate_deploy_link with non-numeric amount returns validation error", async () => {
     const compileResult = await client.callTool({
       name: "compile_tolk",
       arguments: {
@@ -518,11 +516,10 @@ describe("MCP server integration", () => {
     const bocMatch = compileText.match(/### BoC \(base64\)\n```\n(.+)\n```/);
     expect(bocMatch).toBeTruthy();
 
-    await expect(
-      client.callTool({
-        name: "generate_deploy_link",
-        arguments: { codeBoc64: bocMatch![1], amount: "abc" },
-      }),
-    ).rejects.toThrow();
+    const result = await client.callTool({
+      name: "generate_deploy_link",
+      arguments: { codeBoc64: bocMatch![1], amount: "abc" },
+    });
+    expect(result.isError).toBe(true);
   });
 });
