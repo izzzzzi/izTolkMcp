@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/izzzzzi/izTolkMcp/compare/v1.2.0...v1.2.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* harden MCP validation and release metadata ([8bc6360](https://github.com/izzzzzi/izTolkMcp/commit/8bc63601594bebe05993325e8c521dcc3c606f84))
+* sync npm lockfile ([8186762](https://github.com/izzzzzi/izTolkMcp/commit/818676276c57ab45d1fff2d022fa4b39c3cace7d))
+
 # [1.2.0](https://github.com/izzzzzi/izTolkMcp/compare/v1.1.1...v1.2.0) (2026-02-27)
 
 
