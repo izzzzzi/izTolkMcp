@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/izzzzzi/izTolkMcp/compare/v1.2.1...v1.3.0) (2026-03-27)
+
+
+### Features
+
+* upgrade to @ton/tolk-js v1.3 with pathMappings, tolkVersion, and updated docs ([c765753](https://github.com/izzzzzi/izTolkMcp/commit/c765753c3ee046f1fa5204622530814f91ebff89))
+
 ## [1.2.1](https://github.com/izzzzzi/izTolkMcp/compare/v1.2.0...v1.2.1) (2026-03-07)
 
 
