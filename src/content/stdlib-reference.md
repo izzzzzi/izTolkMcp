@@ -18,21 +18,29 @@ These functions evaluate at compile time and embed constant values directly into
 |----------|-------------|-------------|
 | `address("EQ...")` | Embeds a contract address | `address` |
 | `ton("0.05")` | Calculates nanoToncoin value | `coins` |
-| `stringCrc32("str")` | CRC32 checksum | `int` |
-| `stringCrc16("str")` | CRC16 checksum | `int` |
-| `stringSha256("str")` | SHA256 hash | `uint256` |
-| `stringSha256_32("str")` | SHA256 truncated to 32 bits | `int` |
-| `stringToBase256("str")` | Base-256 conversion | `int` |
-| `stringHexToSlice("hex")` | Hex bytes to slice | `slice` |
+| `"str".crc32()` | CRC32 checksum (v1.3+, replaces `stringCrc32`) | `int` |
+| `"str".crc16()` | CRC16 checksum (v1.3+, replaces `stringCrc16`) | `int` |
+| `"str".sha256()` | SHA256 hash (v1.3+, replaces `stringSha256`) | `uint256` |
+| `"str".sha256_32()` | SHA256 truncated to 32 bits (v1.3+, replaces `stringSha256_32`) | `int` |
+| `"str".toBase256()` | Base-256 conversion (v1.3+, replaces `stringToBase256`) | `int` |
+| `"hex".hexToSlice()` | Hex bytes to slice (v1.3+, replaces `stringHexToSlice`) | `slice` |
+| `"str".literalSlice()` | String to slice literal (v1.3+) | `slice` |
 
-### Tuple Operations
+> **Note:** The old `stringCrc32()`, `stringCrc16()`, `stringSha256()`, `stringSha256_32()`, `stringToBase256()` forms still work but are deprecated in v1.3. `stringHexToSlice()` is deprecated -- use `"hex".hexToSlice()` instead.
+
+### Array and Tuple Operations
+
+In v1.3+, `array<T>` replaces raw `tuple` for typed collections. The old `tuple` is now `type tuple = array<unknown>`.
 
 | Function/Method | Description |
 |-----------------|-------------|
-| `t.push(value)` | Push value onto tuple |
-| `t.get(index)` | Get value at index |
-| `t.size()` | Get tuple size |
-| `t.first()` | Get first element |
+| `a.push(value)` | Push value onto array |
+| `a.get(index)` | Get value at index |
+| `a.set(index, value)` | Set value at index |
+| `a.size()` | Get array size |
+| `a.first()` | Get first element |
+| `a.last()` | Get last element |
+| `a.pop()` | Remove and return last element |
 | `toTuple(...)` | Create tuple from values |
 | `fromTuple(t)` | Destructure tuple |
 
@@ -73,6 +81,7 @@ These functions evaluate at compile time and embed constant values directly into
 | Function/Method | Description |
 |-----------------|-------------|
 | `cell.hash()` | Hash of a cell (uint256) |
+| `cell.hashEqual(other)` | Compare two cells by hash (v1.3+) |
 | `slice.hash()` | Hash of a slice (uint256) |
 | `isSignatureValid(hash, signature, publicKey)` | Verify Ed25519 signature |
 | `random.uint256()` | Random 256-bit unsigned integer |
@@ -115,12 +124,14 @@ These functions evaluate at compile time and embed constant values directly into
 | `b.storeBool(flag)` | Store boolean |
 | `b.storeCoins(amount)` | Store coins value |
 | `b.storeSlice(s)` | Store slice data |
+| `b.storeString(str)` | Store string value (v1.3+) |
 | `s.loadUint(bits)` | Load unsigned integer |
 | `s.loadInt(bits)` | Load signed integer |
 | `s.loadRef()` | Load cell reference |
 | `s.loadAddress()` | Load address |
 | `s.loadBool()` | Load boolean |
 | `s.loadCoins()` | Load coins value |
+| `s.loadString()` | Load string value (v1.3+) |
 | `s.skipBits(n)` | Skip bits |
 | `s.remainingBitsCount()` | Remaining bits in slice |
 | `s.remainingRefsCount()` | Remaining refs in slice |
@@ -163,13 +174,22 @@ Handles exotic cell parsing and library references. Used for working with Merkle
 import "@stdlib/lisp-lists"
 ```
 
-Manages nested tuple-based list structures (cons lists):
+Typed lisp-style linked lists using `lisp_list<T>` (v1.3+):
 
-| Function | Description |
-|----------|-------------|
-| `listGetHead(l)` | Get head of list |
-| `listGetTail(l)` | Get tail of list |
-| `listPrepend(head, tail)` | Prepend to list |
+| Method | Description |
+|--------|-------------|
+| `l.isEmpty()` | Check if list is empty |
+| `l.prependHead(value)` | Prepend value to list |
+| `l.popHead()` | Remove and return head |
+| `l.getHead()` | Get head value |
+| `l.getTail()` | Get tail of list |
+| `l.calculateSize()` | Calculate list length |
+| `l.calculateReversed()` | Return reversed copy |
+| `l.calculateConcatenation(other)` | Concatenate two lists |
+| `l.packToBuilder(b)` | Serialize to builder |
+| `lisp_list<T>.unpackFromSlice(s)` | Deserialize from slice |
+
+> **Note:** The old free functions `listGetHead()`, `listGetTail()`, `listPrepend()`, `createEmptyList()` are deprecated in v1.3. Use method syntax on `lisp_list<T>` and `[] as lisp_list<T>` instead.
 
 ### @stdlib/tvm-dicts
 
@@ -189,6 +209,48 @@ Direct TVM register and stack manipulation:
 - Access to c3, c4, c5, c7 registers
 - Stack inspection and manipulation
 - Low-level TVM instruction wrappers
+- **`VmExitCode` enum** (v1.3+) -- named constants for all standard TVM exit codes (0-63): `NormalTermination`, `StackUnderflow`, `IntegerOverflow`, `OutOfGasError`, `CellUnderflow`, `CellOverflow`, `DictionaryError`, `TypeCheckError`, etc.
+
+### @stdlib/strings (v1.3+)
+
+```tolk
+import "@stdlib/strings"
+```
+
+String utilities and `StringBuilder`:
+
+| Function/Method | Description |
+|-----------------|-------------|
+| `str.depth()` | Get cell depth of string |
+| `str.calculateLength()` | Calculate string length |
+| `str.hash()` | Hash of string |
+| `str.equalTo(other)` | Compare two strings |
+| `n.toDecimalString()` | Convert integer to decimal string |
+| `str.prefixWith00()` | Prefix string with 0x00 byte |
+| `str.prefixWith01()` | Prefix string with 0x01 byte |
+| `StringBuilder.create()` | Create new string builder |
+| `sb.append(str)` | Append string |
+| `sb.appendInt(n)` | Append integer as decimal |
+| `sb.build()` | Build final string |
+
+### @stdlib/reflection (v1.3+)
+
+```tolk
+import "@stdlib/reflection"
+```
+
+Compile-time type introspection:
+
+| Function | Description |
+|----------|-------------|
+| `reflect.typeNameOf<T>()` | Get type name as string |
+| `reflect.typeNameOfObject(obj)` | Get runtime type name |
+| `reflect.stackSizeOf<T>()` | Get TVM stack slots for type |
+| `reflect.stackSizeOfObject(obj)` | Get TVM stack slots for object |
+| `reflect.serializationPrefixOf<T>()` | Get serialization prefix |
+| `reflect.estimateSerializationOf<T>()` | Estimate serialization size |
+| `reflect.sourceLocation()` | Get current source location |
+| `reflect.sourceLocationAsString()` | Get source location as string |
 
 ---
 

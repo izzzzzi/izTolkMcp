@@ -132,6 +132,43 @@ Tolk is a fork of FunC, first announced at TON Gateway in 2024, with v0.6 markin
 - Enhanced compiler diagnostics
 - Additional standard library methods
 
+## v1.3 -- Strings, Arrays, and Reflection
+
+### New Types
+
+- **`string` built-in type** -- backed by snake-format cells. Compile-time methods: `string.crc32()`, `string.crc16()`, `string.sha256()`, `string.sha256_32()`, `string.hexToSlice()`, `string.toBase256()`, `string.literalSlice()`. Runtime method: `string.beginParse()`
+- **`array<T>` type** replacing raw `tuple` -- typed generic arrays with `push()`, `get()`, `set()`, `first()`, `last()`, `pop()`, `size()`. The old `tuple` is now `type tuple = array<unknown>`
+- **`unknown` type** -- represents one TVM stack slot of unknown type, any type can be cast to/from `unknown`
+- **`lisp_list<T>` type** -- typed lisp-style list with methods: `isEmpty()`, `prependHead()`, `popHead()`, `getHead()`, `getTail()`, `calculateSize()`, `calculateReversed()`, `calculateConcatenation()`, plus serialization support
+
+### New Standard Library Modules
+
+- **`@stdlib/strings`** -- `string.depth()`, `string.calculateLength()`, `string.hash()`, `string.equalTo()`, `int.toDecimalString()`, `string.prefixWith00()`, `string.prefixWith01()`, and `StringBuilder` struct with `create()`, `append()`, `appendInt()`, `build()` methods
+- **`@stdlib/reflection`** -- compile-time type introspection: `reflect.typeNameOf<T>()`, `reflect.typeNameOfObject()`, `reflect.stackSizeOf<T>()`, `reflect.stackSizeOfObject()`, `reflect.serializationPrefixOf<T>()`, `reflect.estimateSerializationOf<T>()`, `reflect.sourceLocation()`, `reflect.sourceLocationAsString()`
+
+### New Features
+
+- **`VmExitCode` enum** in `@stdlib/tvm-lowlevel` -- named constants for all standard TVM exit codes (0-63): `NormalTermination`, `StackUnderflow`, `IntegerOverflow`, `OutOfGasError`, etc.
+- **`cell.hashEqual()`** -- compare two cells by hash
+- **`slice.loadString()`** and **`builder.storeString()`** -- read/write string values from/to cells
+- **`pathMappings`** in compiler config -- maps `@alias` prefixes to folder paths for import resolution
+- **`tolkVersion`** in compilation result -- compiler version string included in successful output
+- **`@fiftlib/*` files embedded** -- Fift library files (`Asm.fif`, `Fift.fif`) are now bundled and resolved internally
+
+### Breaking Changes
+
+- `tuple` is now `array<unknown>` -- use `array<T>` for typed arrays
+- `sizeof<T>()` removed -- use `reflect.stackSizeOfObject<T>()` from `@stdlib/reflection`
+- `T.typeName()` and `T.typeNameOfObject()` removed -- use `reflect.typeNameOf<T>()` from `@stdlib/reflection`
+- `createEmptyTuple()` deprecated -- use `[]` syntax
+- `createEmptyList()` deprecated -- use `[] as lisp_list<T>`
+- `createEmptyMap()` deprecated -- use `[]` with type annotation
+- `stringHexToSlice()` deprecated -- use `"hex".hexToSlice()`
+- `debug.printString()` now requires `string` parameter (was generic)
+- `address()` constructor now takes `string` parameter (was `slice`)
+- Lisp list API rewritten from free functions to method syntax on `lisp_list<T>`
+- `experimentalOptions` compiler config field deprecated
+
 ---
 
 ## Standard Library Modules

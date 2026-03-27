@@ -158,7 +158,7 @@ Non-null assertion: `val value = nullableVar!;`
 `map<K, V>` -- high-level abstraction over TVM dictionaries.
 
 ```tolk
-var m: map<int8, int32> = createEmptyMap();
+var m: map<int8, int32> = [];
 m.set(1, 10);
 m.addIfNotExists(2, -20);
 m.delete(2);
@@ -200,6 +200,61 @@ enum Mode {
 ```
 
 Enums are distinct types, not integers. Serialized as `(u)intN`. Casting: `Color.Blue as int` (gives 2), `2 as Color` (gives `Color.Blue`).
+
+### Strings (v1.3+)
+
+The `string` type is backed by snake-format cells. Strings have compile-time and runtime methods:
+
+```tolk
+// Compile-time methods on string literals
+val crc = "hello".crc32();
+val hash = "data".sha256();
+val s = "0A0B".hexToSlice();
+
+// Runtime methods
+val parsed = myString.beginParse();
+
+// String I/O on cells
+b.storeString(myString);
+val str = s.loadString();
+```
+
+Use `import "@stdlib/strings"` for additional string utilities and `StringBuilder`.
+
+### Arrays (v1.3+)
+
+`array<T>` is a typed generic array replacing raw `tuple`:
+
+```tolk
+var arr: array<int> = [];
+arr.push(1);
+arr.push(2);
+val first = arr.first();
+val last = arr.last();
+val size = arr.size();
+val popped = arr.pop();
+```
+
+The old `tuple` type is now `type tuple = array<unknown>`.
+
+### Unknown Type (v1.3+)
+
+`unknown` represents one TVM stack slot of unknown type. Any type can be cast to/from `unknown`.
+
+### Lisp Lists (v1.3+)
+
+`lisp_list<T>` provides typed lisp-style linked lists:
+
+```tolk
+import "@stdlib/lisp-lists"
+
+var list: lisp_list<int> = [] as lisp_list<int>;
+list = list.prependHead(1);
+list = list.prependHead(2);
+val head = list.getHead();    // 2
+val tail = list.getTail();
+val size = list.calculateSize();
+```
 
 ### Tensors and Tuples
 

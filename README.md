@@ -37,8 +37,8 @@
 | 🔨 **4 MCP Tools** | `compile_tolk`, `check_tolk_syntax`, `get_compiler_version`, `generate_deploy_link` |
 | 📄 **6 MCP Resources** | Language guide, stdlib reference, changelog, FunC migration guide, example contracts |
 | 💬 **3 MCP Prompts** | Guided workflows for writing, reviewing, and debugging smart contracts |
-| ⚙️ **Full Compiler Options** | Optimization levels (0-2), stack comments, multi-file compilation |
-| 📦 **Multi-file Support** | Compile projects with multiple `.tolk` source files and `@stdlib/*` imports |
+| ⚙️ **Full Compiler Options** | Optimization levels (0-2), stack comments, path mappings, multi-file compilation |
+| 📦 **Multi-file Support** | Compile projects with multiple `.tolk` source files, `@stdlib/*` and `@fiftlib/*` imports |
 | 🔗 **Deployment Links** | Generate `ton://` deeplinks and Tonkeeper URLs for wallet deployment |
 | 🚀 **Zero Configuration** | Runs via `npx` with no external dependencies beyond Node.js |
 
@@ -192,7 +192,7 @@ Returns the version of the Tolk compiler bundled in `@ton/tolk-js` (WASM).
 
 ### 🔨 `compile_tolk`
 
-Compiles Tolk smart contract source code. Returns Fift output, BoC (Bag of Cells) in base64, and the code hash.
+Compiles Tolk smart contract source code. Returns Fift output, BoC (Bag of Cells) in base64, code hash, and compiler version.
 
 | Parameter | Type | Required | Description |
 |-----------|------|:--------:|-------------|
@@ -200,6 +200,7 @@ Compiles Tolk smart contract source code. Returns Fift output, BoC (Bag of Cells
 | `sources` | `object` | ✅ | Map of `filename -> source code`. Must include the entrypoint file. |
 | `optimizationLevel` | `number` | — | Optimization level 0-2 (default: 2) |
 | `withStackComments` | `boolean` | — | Include stack layout comments in Fift output |
+| `pathMappings` | `object` | — | Maps `@alias` prefixes to folder paths for import resolution |
 
 ### ✅ `check_tolk_syntax`
 
@@ -209,6 +210,7 @@ Checks Tolk source code for syntax and type errors without returning full compil
 |-----------|------|:--------:|-------------|
 | `entrypointFileName` | `string` | ✅ | The main `.tolk` file to check |
 | `sources` | `object` | ✅ | Map of `filename -> source code` |
+| `pathMappings` | `object` | — | Maps `@alias` prefixes to folder paths for import resolution |
 
 ### 🔗 `generate_deploy_link`
 

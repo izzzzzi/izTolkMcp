@@ -73,8 +73,9 @@ export function registerTools(server: McpServer): void {
     "compile_tolk",
     "Compiles Tolk smart contract source code using @ton/tolk-js. " +
       "Provide source files as a map of filename->content. The entrypoint file must be included. " +
-      "Standard library imports (@stdlib/*) are resolved automatically. " +
-      "Returns compiled Fift code, BoC (Bag of Cells) in base64, and the code hash.",
+      "Standard library imports (@stdlib/*, @fiftlib/*) are resolved automatically. " +
+      "Supports pathMappings for custom @alias import resolution. " +
+      "Returns compiled Fift code, BoC (Bag of Cells) in base64, code hash, and compiler version.",
     {
       entrypointFileName: z.string().describe('The main .tolk file to compile (e.g., "main.tolk")'),
       sources: z
@@ -85,6 +86,13 @@ export function registerTools(server: McpServer): void {
         ),
       optimizationLevel: z.number().int().min(0).max(2).optional().describe("Optimization level 0-2 (default: 2)"),
       withStackComments: z.boolean().optional().describe("Include stack layout comments in Fift output"),
+      pathMappings: z
+        .record(z.string(), z.string())
+        .optional()
+        .describe(
+          "Maps @alias prefixes to absolute folder paths for import resolution. " +
+            'Example: {"@mylib": "/path/to/mylib"}',
+        ),
     },
     async (args) => {
       const { sources, entrypointFileName } = args;
@@ -103,7 +111,7 @@ export function registerTools(server: McpServer): void {
           fsReadCallback: makeFsReadCallback(sources),
           optimizationLevel: args.optimizationLevel ?? 2,
           withStackComments: args.withStackComments ?? false,
-          experimentalOptions: undefined,
+          ...(args.pathMappings ? { pathMappings: args.pathMappings } : {}),
         });
 
         if (result.status === "error") {
@@ -117,6 +125,7 @@ export function registerTools(server: McpServer): void {
         const lines: string[] = [
           `## Compilation Successful`,
           "",
+          `**Compiler version:** \`${result.tolkVersion}\``,
           `**Code hash:** \`${result.codeHashHex}\``,
           `**BoC size:** ${bocBytes.length} bytes`,
           "",
@@ -150,7 +159,8 @@ export function registerTools(server: McpServer): void {
   server.tool(
     "check_tolk_syntax",
     "Checks Tolk source code for syntax and type errors without returning full compilation output. " +
-      "Faster feedback loop for iterative development. Returns OK + code hash on success, or error details on failure.",
+      "Faster feedback loop for iterative development. Supports pathMappings for custom @alias import resolution. " +
+      "Returns OK + code hash on success, or error details on failure.",
     {
       entrypointFileName: z.string().describe('The main .tolk file to check (e.g., "main.tolk")'),
       sources: z
@@ -158,6 +168,13 @@ export function registerTools(server: McpServer): void {
         .describe(
           "Object mapping filename -> source code content. Must include the entrypoint file. " +
             'Example: {"main.tolk": "fun main(): int { return 0; }"}',
+        ),
+      pathMappings: z
+        .record(z.string(), z.string())
+        .optional()
+        .describe(
+          "Maps @alias prefixes to absolute folder paths for import resolution. " +
+            'Example: {"@mylib": "/path/to/mylib"}',
         ),
     },
     async (args) => {
@@ -177,7 +194,7 @@ export function registerTools(server: McpServer): void {
           fsReadCallback: makeFsReadCallback(sources),
           optimizationLevel: 2,
           withStackComments: false,
-          experimentalOptions: undefined,
+          ...(args.pathMappings ? { pathMappings: args.pathMappings } : {}),
         });
 
         if (result.status === "error") {

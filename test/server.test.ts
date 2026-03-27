@@ -59,7 +59,6 @@ describe("Direct tolk-js compiler", () => {
       fsReadCallback: () => MINIMAL_CONTRACT,
       optimizationLevel: 2,
       withStackComments: false,
-      experimentalOptions: undefined,
     });
     expect(result.status).toBe("ok");
     if (result.status === "ok") {
@@ -75,7 +74,6 @@ describe("Direct tolk-js compiler", () => {
       fsReadCallback: () => INVALID_CODE,
       optimizationLevel: 2,
       withStackComments: false,
-      experimentalOptions: undefined,
     });
     expect(result.status).toBe("error");
     if (result.status === "error") {
@@ -89,7 +87,6 @@ describe("Direct tolk-js compiler", () => {
       fsReadCallback: () => MINIMAL_CONTRACT,
       optimizationLevel: 0,
       withStackComments: false,
-      experimentalOptions: undefined,
     });
     expect(result.status).toBe("ok");
   });
@@ -100,7 +97,6 @@ describe("Direct tolk-js compiler", () => {
       fsReadCallback: () => MINIMAL_CONTRACT,
       optimizationLevel: 2,
       withStackComments: true,
-      experimentalOptions: undefined,
     });
     expect(result.status).toBe("ok");
     if (result.status === "ok") {
@@ -123,7 +119,6 @@ describe("Direct tolk-js compiler", () => {
       },
       optimizationLevel: 2,
       withStackComments: false,
-      experimentalOptions: undefined,
     });
     expect(result.status).toBe("ok");
   });
@@ -135,7 +130,41 @@ describe("Direct tolk-js compiler", () => {
       fsReadCallback: () => code,
       optimizationLevel: 2,
       withStackComments: false,
-      experimentalOptions: undefined,
+    });
+    expect(result.status).toBe("ok");
+  });
+
+  it("returns tolkVersion in successful result", async () => {
+    const result = await runTolkCompiler({
+      entrypointFileName: "main.tolk",
+      fsReadCallback: () => MINIMAL_CONTRACT,
+      optimizationLevel: 2,
+      withStackComments: false,
+    });
+    expect(result.status).toBe("ok");
+    if (result.status === "ok") {
+      expect(result.tolkVersion).toMatch(/^\d+\.\d+/);
+    }
+  });
+
+  it("resolves @stdlib/strings import", async () => {
+    const code = `import "@stdlib/strings"\nfun main(): int { return 0; }`;
+    const result = await runTolkCompiler({
+      entrypointFileName: "main.tolk",
+      fsReadCallback: () => code,
+      optimizationLevel: 2,
+      withStackComments: false,
+    });
+    expect(result.status).toBe("ok");
+  });
+
+  it("resolves @stdlib/reflection import", async () => {
+    const code = `import "@stdlib/reflection"\nfun main(): int { return 0; }`;
+    const result = await runTolkCompiler({
+      entrypointFileName: "main.tolk",
+      fsReadCallback: () => code,
+      optimizationLevel: 2,
+      withStackComments: false,
     });
     expect(result.status).toBe("ok");
   });
@@ -315,6 +344,7 @@ describe("MCP server integration", () => {
     const text = (result.contents[0] as any).text;
     expect(text).toContain("v0.6");
     expect(text).toContain("v1.0");
+    expect(text).toContain("v1.3");
   });
 
   it("reads stdlib-reference resource", async () => {
@@ -456,6 +486,19 @@ describe("MCP server integration", () => {
     expect(result.isError).toBeFalsy();
     const text = (result.content as any[])[0].text;
     expect(text).toContain("Compilation Successful");
+  });
+
+  it("compile_tolk includes compiler version in output", async () => {
+    const result = await client.callTool({
+      name: "compile_tolk",
+      arguments: {
+        entrypointFileName: "main.tolk",
+        sources: { "main.tolk": MINIMAL_CONTRACT },
+      },
+    });
+    expect(result.isError).toBeFalsy();
+    const text = (result.content as any[])[0].text;
+    expect(text).toContain("Compiler version");
   });
 
   it("compile_tolk with withStackComments true via MCP tool", async () => {
