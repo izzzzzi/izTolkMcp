@@ -345,3 +345,8 @@ Pre-commit hooks enforce code quality automatically:
 - **Husky** — Git hooks manager
 - **lint-staged** — runs checks only on staged files
 
+
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/izzzzzi-iztolkmcp).
+
