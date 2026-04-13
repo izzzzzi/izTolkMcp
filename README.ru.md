@@ -170,7 +170,7 @@ claude mcp add tolk -- npx -y iz-tolk-mcp
   "mcpServers": {
     "tolk": {
       "command": "node",
-      "args": ["/absolute/path/to/izTolkMcp/dist/index.js"]
+      "args": ["/absolute/path/to/izTolkMcp/dist/cli.js"]
     }
   }
 }

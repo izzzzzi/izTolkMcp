@@ -6,12 +6,12 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "iz-tolk-mcp": "dist/index.js"
+    "iz-tolk-mcp": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc && node scripts/copy-content.js",
-    "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
+    "start": "node dist/cli.js",
+    "dev": "tsx src/cli.ts",
     "test": "vitest run",
     "lint": "biome check src/ test/",
     "lint:fix": "biome check --write src/ test/",
