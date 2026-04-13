@@ -5,3 +5,4 @@ dist/
 .conventions/
 .mcpregistry_*
 .playwright-mcp/
+docs/superpowers/
