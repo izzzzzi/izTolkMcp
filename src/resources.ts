@@ -1,31 +1,5 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-
-const currentDir = import.meta.url ? dirname(fileURLToPath(import.meta.url)) : process.cwd();
-const contentDir = join(currentDir, "content");
-
-function loadContent(filename: string): string {
-  return readFileSync(join(contentDir, filename), "utf-8");
-}
-
-// Lazy-loaded content cache
-let _cache: Record<string, string> | null = null;
-
-function getContent(): Record<string, string> {
-  if (!_cache) {
-    _cache = {
-      "language-guide": loadContent("language-guide.md"),
-      "stdlib-reference": loadContent("stdlib-reference.md"),
-      changelog: loadContent("changelog.md"),
-      "tolk-vs-func": loadContent("tolk-vs-func.md"),
-      "example-counter": loadContent("example-counter.tolk"),
-      "example-jetton": loadContent("example-jetton.tolk"),
-    };
-  }
-  return _cache;
-}
+import { loadContent } from "./content.js";
 
 export function registerResources(server: McpServer): void {
   server.resource(
@@ -37,7 +11,7 @@ export function registerResources(server: McpServer): void {
         {
           uri: "tolk://docs/language-guide",
           mimeType: "text/markdown",
-          text: getContent()["language-guide"],
+          text: loadContent("language-guide.md"),
         },
       ],
     }),
@@ -52,7 +26,7 @@ export function registerResources(server: McpServer): void {
         {
           uri: "tolk://docs/stdlib-reference",
           mimeType: "text/markdown",
-          text: getContent()["stdlib-reference"],
+          text: loadContent("stdlib-reference.md"),
         },
       ],
     }),
@@ -67,7 +41,7 @@ export function registerResources(server: McpServer): void {
         {
           uri: "tolk://docs/changelog",
           mimeType: "text/markdown",
-          text: getContent().changelog,
+          text: loadContent("changelog.md"),
         },
       ],
     }),
@@ -82,7 +56,7 @@ export function registerResources(server: McpServer): void {
         {
           uri: "tolk://docs/tolk-vs-func",
           mimeType: "text/markdown",
-          text: getContent()["tolk-vs-func"],
+          text: loadContent("tolk-vs-func.md"),
         },
       ],
     }),
@@ -97,7 +71,7 @@ export function registerResources(server: McpServer): void {
         {
           uri: "tolk://examples/counter",
           mimeType: "text/x-tolk",
-          text: getContent()["example-counter"],
+          text: loadContent("example-counter.tolk"),
         },
       ],
     }),
@@ -112,7 +86,7 @@ export function registerResources(server: McpServer): void {
         {
           uri: "tolk://examples/jetton",
           mimeType: "text/x-tolk",
-          text: getContent()["example-jetton"],
+          text: loadContent("example-jetton.tolk"),
         },
       ],
     }),

@@ -1,15 +1,6 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-
-const currentDir = import.meta.url ? dirname(fileURLToPath(import.meta.url)) : process.cwd();
-const contentDir = join(currentDir, "content");
-
-function loadContent(filename: string): string {
-  return readFileSync(join(contentDir, filename), "utf-8");
-}
+import { loadContent } from "./content.js";
 
 export function registerPrompts(server: McpServer): void {
   // ─── Prompt 1: write_smart_contract ─────────────────────────────
