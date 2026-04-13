@@ -10,7 +10,9 @@
 **Status:** Approved
 **Context:** All 3 competitor submissions use a single-file architecture (everything in one index.ts). This makes the codebase hard to navigate and review.
 **Decision:** Split into focused modules:
-- `src/index.ts` — server entry point, transport setup, registration orchestration
+- `src/index.ts` — server factory, registration orchestration, library exports
+- `src/cli.ts` — CLI entrypoint, stdio transport setup
+- `src/content.ts` — shared content loader with lazy file cache
 - `src/tools.ts` — all 4 MCP tools (get_compiler_version, compile_tolk, check_tolk_syntax, generate_deploy_link)
 - `src/resources.ts` — all 6 MCP resources with embedded content
 - `src/prompts.ts` — all 3 MCP prompts
@@ -20,21 +22,22 @@
 
 ---
 
-## ADR-2: Resource content embedded as string constants
+## ADR-2: Resource content loaded from files with lazy cache
 
-**Status:** Approved
+**Status:** Revised (was: embedded string constants)
 **Context:** Two approaches for serving documentation content:
-  1. Runtime file reading (readFileSync from dist/content/)
+  1. Runtime file reading (readFileSync from content/)
   2. Embedded string constants (export const CONTENT = `...`)
 
-**Decision:** Embed content as string constants in `src/resources.ts`.
+**Original decision:** Embed content as string constants in `src/resources.ts`.
+**Revised decision:** Load content from `src/content/` files via a shared `src/content.ts` module with a lazy `Map`-based cache. Content is read once on first access, then served from memory.
 **Rationale:**
-- No file-copying build step needed (avoids dist/content/ synchronization)
-- Guaranteed to work after `npm install` — no missing file issues
-- Simpler deployment — single JS bundle, no runtime fs dependency
-- Matches oxgeneral's pattern (proven to work)
+- Separates content from code — easier to edit documentation independently
+- Shared module (`src/content.ts`) eliminates duplication between `resources.ts` and `prompts.ts`
+- Lazy cache gives the same runtime performance as embedded constants
+- Build step (`scripts/copy-content.js`) copies `src/content/` to `dist/content/` for distribution
 
-**Trade-off:** Larger source file, harder to edit content in isolation. Acceptable for static documentation that changes infrequently.
+**Trade-off:** Requires content files to exist at runtime (handled by build step). Acceptable for a server that bundles its content in the npm package.
 
 ---
 
@@ -54,28 +57,23 @@
 
 ---
 
-## ADR-4: z.any() for sources parameter
+## ADR-4: z.record() for sources parameter
 
-**Status:** Approved (workaround)
-**Context:** The `compile_tolk` tool accepts a `sources` parameter of type `Record<string, string>`. Using `z.record(z.string(), z.string())` causes a Zod type depth issue when combined with MCP SDK's internal type processing, resulting in TypeScript compilation errors.
-**Decision:** Use `z.any()` with `.describe()` that documents the expected shape and provides an example.
-**Rationale:** Pragmatic workaround. The runtime validation is handled manually (checking that sources is an object with string values). The `.describe()` metadata ensures LLMs understand the expected format.
-**Action:** Add a `// TODO: Replace with z.record() when MCP SDK fixes Zod type depth issue` comment in code.
+**Status:** Revised (was: z.any() workaround)
+**Context:** The `compile_tolk` tool accepts a `sources` parameter of type `Record<string, string>`. In Zod v3, using `z.record(z.string(), z.string())` caused a type depth issue when combined with MCP SDK's internal type processing.
+**Original decision:** Use `z.any()` with `.describe()` to document the expected shape.
+**Revised decision:** Use `z.record(z.string(), z.string())` directly. The Zod v4 upgrade resolved the type depth incompatibility.
+**Rationale:** Proper schema validation at the MCP SDK boundary — invalid inputs are rejected before reaching tool handlers.
 
 ---
 
-## ADR-5: strict: false in tsconfig
+## ADR-5: strict: true in tsconfig
 
-**Status:** Approved
-**Context:** TypeScript strict mode (`strict: true`) causes type errors when combining Zod schemas with MCP SDK's type system. Specifically, `strictNullChecks` and `strictFunctionTypes` create incompatibilities in tool handler signatures.
-**Decision:** Set `strict: false` in tsconfig.json.
-**Rationale:**
-- Required for Zod/MCP SDK type compatibility
-- oxgeneral uses the same approach (validated in production)
-- The MCP SDK's type system is not designed for strict TypeScript
-- We still enable `skipLibCheck: true` and `esModuleInterop: true` for other safety
-
-**Trade-off:** Loses some type safety guarantees. Mitigated by thorough test coverage (20+ tests).
+**Status:** Revised (was: strict: false)
+**Context:** TypeScript strict mode (`strict: true`) previously caused type errors when combining Zod v3 schemas with MCP SDK's type system.
+**Original decision:** Set `strict: false` in tsconfig.json.
+**Revised decision:** Set `strict: true`. The Zod v4 upgrade and MCP SDK updates resolved the incompatibilities.
+**Rationale:** Strict mode enables `strictNullChecks`, `noImplicitAny`, and `strictFunctionTypes` — significantly improving type safety with no workarounds needed.
 
 ---
 
@@ -152,10 +150,10 @@
 | # | Decision | Status |
 |---|----------|--------|
 | 1 | Modular file structure | Approved |
-| 2 | Content embedded as string constants | Approved |
+| 2 | Content loaded from files with lazy cache | Revised |
 | 3 | MCP SDK v1 server.tool() API | Approved |
-| 4 | z.any() for sources parameter | Approved (workaround) |
-| 5 | strict: false in tsconfig | Approved |
+| 4 | z.record() for sources parameter | Revised |
+| 5 | strict: true in tsconfig | Revised |
 | 6 | generate_deploy_link differentiator | Approved |
 | 7 | convert_func_to_tolk excluded | Approved (exclusion) |
 | 8 | 6 resources without NFT | Approved |
