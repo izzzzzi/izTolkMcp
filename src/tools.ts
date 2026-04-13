@@ -3,6 +3,10 @@ import { beginCell, Cell, contractAddress, storeStateInit } from "@ton/core";
 import { getTolkCompilerVersion, runTolkCompiler } from "@ton/tolk-js";
 import { z } from "zod";
 
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 const MAX_TOTAL_SIZE = 1_048_576; // 1 MB
 const MAX_FILE_COUNT = 50;
 
@@ -58,9 +62,9 @@ export function registerTools(server: McpServer): void {
         return {
           content: [{ type: "text", text: `Tolk compiler version: ${version}` }],
         };
-      } catch (err: any) {
+      } catch (err) {
         return {
-          content: [{ type: "text", text: `Failed to get compiler version: ${err.message}` }],
+          content: [{ type: "text", text: `Failed to get compiler version: ${getErrorMessage(err)}` }],
           isError: true,
         };
       }
@@ -145,9 +149,9 @@ export function registerTools(server: McpServer): void {
         }
 
         return { content: [{ type: "text", text: lines.join("\n") }] };
-      } catch (err: any) {
+      } catch (err) {
         return {
-          content: [{ type: "text", text: `Unexpected compiler error: ${err.message}` }],
+          content: [{ type: "text", text: `Unexpected compiler error: ${getErrorMessage(err)}` }],
           isError: true,
         };
       }
@@ -210,9 +214,9 @@ export function registerTools(server: McpServer): void {
         }
 
         return { content: [{ type: "text", text }] };
-      } catch (err: any) {
+      } catch (err) {
         return {
-          content: [{ type: "text", text: `Unexpected compiler error: ${err.message}` }],
+          content: [{ type: "text", text: `Unexpected compiler error: ${getErrorMessage(err)}` }],
           isError: true,
         };
       }
@@ -247,9 +251,9 @@ export function registerTools(server: McpServer): void {
       let code: Cell;
       try {
         code = Cell.fromBase64(codeBoc64);
-      } catch (err: any) {
+      } catch (err) {
         return {
-          content: [{ type: "text", text: `Error: invalid codeBoc64 — ${err.message}` }],
+          content: [{ type: "text", text: `Error: invalid codeBoc64 — ${getErrorMessage(err)}` }],
           isError: true,
         };
       }
@@ -258,9 +262,9 @@ export function registerTools(server: McpServer): void {
       if (initialDataBoc64) {
         try {
           data = Cell.fromBase64(initialDataBoc64);
-        } catch (err: any) {
+        } catch (err) {
           return {
-            content: [{ type: "text", text: `Error: invalid initialDataBoc64 — ${err.message}` }],
+            content: [{ type: "text", text: `Error: invalid initialDataBoc64 — ${getErrorMessage(err)}` }],
             isError: true,
           };
         }
