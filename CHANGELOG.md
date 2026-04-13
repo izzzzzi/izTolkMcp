@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/izzzzzi/izTolkMcp/compare/v1.3.0...v1.3.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* use safe error extraction instead of err.message ([7df0fb3](https://github.com/izzzzzi/izTolkMcp/commit/7df0fb36a21955f414989ffedb5affeab82ac1d8))
+
 # [1.3.0](https://github.com/izzzzzi/izTolkMcp/compare/v1.2.1...v1.3.0) (2026-03-27)
 
 
